@@ -3,57 +3,30 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using Core.DataAccess.EntityFramework;
 using DataAccess.Abstract;
 using Entities.Concrete;
+using Entities.DTOs;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Concrete.EntityFramework
 {
-   public class EfCarDal:ICarDal
+    public class EfCarDal : EfEntityRepositoryBase<Car, CarContext>, ICarDal
     {
-        public List<Car> GetAll(Expression<Func<Car, bool>> filter = null)
+        public List<CarDetailDto> GetCarDetails()
         {
             using (CarContext carContext = new CarContext())
             {
-                return filter == null ? carContext.Set<Car>().ToList() : carContext.Set<Car>().Where(filter).ToList();
-            }
-        }
+                var result = from c in carContext.Cars
+                    join b in carContext.Brands
+                        on c.BrandId equals b.BrandId
+                    select new CarDetailDto()
+                    {
+                        CarName = c.Description,
+                        BrandName = b.Name,
 
-        public Car Get(Expression<Func<Car, bool>> filter)
-        {
-            using (CarContext carContext = new CarContext())
-            {
-                return carContext.Set<Car>().SingleOrDefault(filter);
-            }
-        }
-
-        public void Add(Car entity)
-        {
-            using (CarContext carContext = new CarContext())
-            {
-                var addedEntity = carContext.Entry(entity);
-                addedEntity.State = EntityState.Added;
-                carContext.SaveChanges();
-            }
-        }
-
-        public void Update(Car entity)
-        {
-            using (CarContext carContext = new CarContext())
-            {
-                var updatesEntity = carContext.Entry(entity);
-                updatesEntity.State = EntityState.Modified;
-                carContext.SaveChanges();
-            }
-        }
-
-        public void Delete(Car entity)
-        {
-            using (CarContext carContext = new CarContext())
-            {
-                var deletedEntity = carContext.Entry(entity);
-                deletedEntity.State = EntityState.Deleted;
-                carContext.SaveChanges();
+                    };
+                return result.ToList();
             }
         }
     }

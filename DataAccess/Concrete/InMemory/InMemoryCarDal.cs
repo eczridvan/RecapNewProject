@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Text;
 using DataAccess.Abstract;
 using Entities.Concrete;
+using Entities.DTOs;
 
 namespace DataAccess.Concrete.InMemory
 {
@@ -60,6 +61,11 @@ namespace DataAccess.Concrete.InMemory
             Car deleteCar = _cars.FirstOrDefault(p => p.CarId == car.CarId);
 
             _cars.Remove(deleteCar);
+        }
+
+        public List<CarDetailDto> GetCarDetails()
+        {
+            throw new NotImplementedException();
         }
 
         public List<Car> GetById(int BrandId)
